@@ -20,7 +20,7 @@ const registrationUseCases = new RegistrationUseCases(userRepo);
 const loginUseCase=new LoginUseCase(userRepo,authService)
 
 const registrationController = new registrationControl(authService,registrationUseCases)
-const loginController=new LoginController(loginUseCase)
+const loginController=new LoginController(loginUseCase,authService)
 
 const packageDef = protoLoader.loadSync(path.resolve(__dirname, './proto/user.proto'), {
   keepCase: true,
@@ -46,6 +46,9 @@ server.addService(userProto.UserService.service, {
   ResendOtp:registrationController.resendOtp,
   CheckUserLogin :loginController.checkLoginUser,
   CheckGoogleSignIn:loginController.checkGoogleSignInUser,
+  ForgotPasswordUser:loginController.forgotPasswordUser,
+  VerifyOtp:loginController.verifyOtp,
+  ResetPassword:loginController.resetPassword,
   GetAllUsers:adminControll.getAllUsers,
   BlockUser:adminControll.blockUser
 })

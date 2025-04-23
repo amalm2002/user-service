@@ -1,6 +1,6 @@
 import User from '../entities/user.model'
 import { registration } from '../entities/user.interface'
-import { log } from 'util'
+
 
 export default class userRepository {
     saveUser = async (userData: registration) => {
@@ -64,6 +64,16 @@ export default class userRepository {
             return { success: false, message: "Error blocking user" };
         }
     }
+
+    updateUserPassword = async (email: string, password: string) => {
+        try {
+            const user = await User.findOneAndUpdate({ email }, { password }, { new: true });         
+            return user;
+        } catch (error) {
+            console.error('Error in updateUserPassword:', error);
+            throw new Error('Failed to update password');
+        }
+    };
 
 
 }
