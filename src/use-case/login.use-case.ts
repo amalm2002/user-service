@@ -17,7 +17,7 @@ export default class LoginUseCase {
     private async handleLogin(user: UserInterface) {
 
         const role = user.isAdmin ? 'Admin' : 'User'
-        const token = await this.auth.createToken(user._id.toString(), '15m', role)
+        const token = await this.auth.createToken(user._id.toString(), '1m', role)
         const refreshToken = await this.auth.createToken(user._id.toString(), '7d', role)
 
         // console.log('userSerive use-case login');

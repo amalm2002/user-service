@@ -17,15 +17,22 @@ export interface UserInterface extends Document {
             status: string
         }[]
     }
-    isAdmin:boolean
+    isAdmin: boolean
+    phone: string
+    address: {
+        city: string;
+        pinCode: number;
+        state: string;
+        street: string;
+      }[];
 }
 
 export interface registration {
     name: string
     email: string
     password: string
-    isAdmin?:boolean
-    isActive?:boolean
+    isAdmin?: boolean
+    isActive?: boolean
 
 }
 
@@ -33,6 +40,6 @@ export interface userData {
     name: string
     email: string
     password: string
-    isAdmin?:boolean
-    isActive?:boolean
+    isAdmin?: boolean
+    isActive?: boolean
 }
