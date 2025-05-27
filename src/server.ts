@@ -2,29 +2,35 @@ import path from 'path';
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import "dotenv/config";
-import registrationControl from './controller/registrationController';
-import RegistrationUseCases from './use-case/registration.use-case'
-import { AuthService } from './services/auth';
-import UserRepository from "./repositeries/userRepo";
-import connectDB from "./config/mongo";
-import LoginController from './controller/loginController';
-import AdminController from './controller/adminController';
-import LoginUseCase from './use-case/login.use-case';
-import ProfileUseCase from './use-case/profile.use-case';
-import ProfileController from './controller/profileController';
+import connectDB from './config/mongo.config';
+import { RegistrationController } from './controllers/implementations/registration.controller';
+import { LoginController } from './controllers/implementations/login.controller';
+import { AdminController } from './controllers/implementations/admin.controller';
+import { ProfileController } from './controllers/implementations/profile.controller';
+import { UserRepository } from './repositories/implementations/user.repository';
+import { AuthService } from './services/implementations/auth.service';
+import { BcryptService } from './services/implementations/bcrypt.service';
+import { GenerateOtpService } from './services/implementations/generate-otp.service';
+import { NodemailerService } from './services/implementations/nodemailer.service';
+import { CartController } from './controllers/implementations/cart.controller';
+import CartService from './services/implementations/cart.service';
+import CartRepository from './repositories/implementations/cart.repository';
+
 connectDB();
 
-const adminControll = new AdminController()
-
+const userRepo = new UserRepository();
 const authService = new AuthService();
-const userRepo = new UserRepository()
-const registrationUseCases = new RegistrationUseCases(userRepo);
-const loginUseCase = new LoginUseCase(userRepo, authService)
-const profileUseCase = new ProfileUseCase(userRepo)
+const bcryptService = new BcryptService();
+const generateOtpService = new GenerateOtpService();
+const nodemailerService = new NodemailerService();
+const cartRepo = new CartRepository()
+const cartService = new CartService(cartRepo)
 
-const registrationController = new registrationControl(authService, registrationUseCases)
-const loginController = new LoginController(loginUseCase, authService)
-const profileController = new ProfileController(profileUseCase)
+const registrationController = new RegistrationController(authService, userRepo, bcryptService);
+const loginController = new LoginController(userRepo, authService, bcryptService);
+const adminController = new AdminController(userRepo);
+const profileController = new ProfileController(userRepo);
+const cartController = new CartController(cartService,)
 
 const packageDef = protoLoader.loadSync(path.resolve(__dirname, './proto/user.proto'), {
   keepCase: true,
@@ -45,26 +51,29 @@ if (!userProto || !userProto.UserService || !userProto.UserService.service) {
 const server = new grpc.Server();
 
 server.addService(userProto.UserService.service, {
-  CreateUser: registrationController.signup,
-  CheckUser: registrationController.checkUser,
-  ResendOtp: registrationController.resendOtp,
-  CheckUserLogin: loginController.checkLoginUser,
-  CheckGoogleSignIn: loginController.checkGoogleSignInUser,
-  ForgotPasswordUser: loginController.forgotPasswordUser,
-  VerifyOtp: loginController.verifyOtp,
-  ResetPassword: loginController.resetPassword,
-  GetAllUsers: adminControll.getAllUsers,
-  BlockUser: adminControll.blockUser,
-  GetUserById:profileController.findUserByTheirId,
-  UpdateUser:profileController.editProfile,
-  UpdateUserAddress:profileController.addNewAddress,
-  DeleteUserAddress:profileController.deleteUserAddress
-})
-
+  CreateUser: registrationController.signup.bind(registrationController),
+  CheckUser: registrationController.checkUser.bind(registrationController),
+  ResendOtp: registrationController.resendOtp.bind(registrationController),
+  CheckUserLogin: loginController.checkLoginUser.bind(loginController),
+  CheckGoogleSignIn: loginController.checkGoogleSignInUser.bind(loginController),
+  ForgotPasswordUser: loginController.forgotPasswordUser.bind(loginController),
+  VerifyOtp: loginController.verifyOtp.bind(loginController),
+  ResetPassword: loginController.resetPassword.bind(loginController),
+  GetAllUsers: adminController.getAllUsers.bind(adminController),
+  BlockUser: adminController.blockUser.bind(adminController),
+  GetUserById: profileController.findUserByTheirId.bind(profileController),
+  UpdateUser: profileController.editProfile.bind(profileController),
+  UpdateUserAddress: profileController.addNewAddress.bind(profileController),
+  DeleteUserAddress: profileController.deleteUserAddress.bind(profileController),
+  AddToCart: cartController.addToCartMenus.bind(cartController),
+  GetCartItems: cartController.getCartItems.bind(cartController),
+  UpdateCartItemQuantity: cartController.updateCartItemQuantity.bind(cartController),
+  RemoveCartItem:cartController.removeCartItems.bind(cartController)
+});
 
 const grpcServer = () => {
   const port = process.env.PORT || '3003';
-  const Domain = process.env.NODE_ENV === 'dev' ? process.env.DEV_DOMAIN : process.env.PRO_DOMAIN_USER
+  const Domain = process.env.NODE_ENV === 'dev' ? process.env.DEV_DOMAIN : process.env.PRO_DOMAIN_USER;
 
   server.bindAsync(`${Domain}:${port}`, grpc.ServerCredentials.createInsecure(), (err, bindPort) => {
     if (err) {
@@ -72,7 +81,6 @@ const grpcServer = () => {
       return;
     }
     console.log(`gRPC user server started on port:${bindPort}`);
-    // server.start();
   });
 };
 
