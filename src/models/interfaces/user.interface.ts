@@ -52,8 +52,15 @@ export interface CartItems {
     price: number;
     name: string;
     discount: number;
-    category:string;
-    restaurantName:string;
+    category: string;
+    restaurantName: string;
+    restaurantId: Types.ObjectId;
+    description: string;
+    timing: string;
+    rating: number;
+    hasVariants: boolean;
+    images: string[];
+    variants: { name: string; price: number; quantity: number }[];
 }
 
 export interface Cart {
@@ -63,4 +70,18 @@ export interface Cart {
     totalAmount: number;
     createdAt?: Date;
     updatedAt?: Date;
+}
+
+
+export interface IWallet {
+    userId: Types.ObjectId;
+    balance: number;
+    transactions: {
+        amount: number;
+        type: 'credit' | 'debit';
+        description: string;
+        createdAt: Date;
+    }[];
+    createdAt: Date;
+    updatedAt: Date;
 }

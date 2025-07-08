@@ -1,6 +1,6 @@
 import { ICartController } from '../interfaces/cart.controller';
 import { ICartService } from '../../services/interfaces/cart.service.interface';
-import { AddToCartDTO, GetCartDTO, RemoveCartItemDTO, UpdateQuantityDTO } from '../../dto/cart/cart.dto';
+import { AddToCartDTO, DeleteUserCartDTO, GetCartDTO, RemoveCartItemDTO, UpdateQuantityDTO } from '../../dto/cart/cart.dto';
 
 export class CartController implements ICartController {
     private cartService: ICartService;
@@ -11,6 +11,8 @@ export class CartController implements ICartController {
 
     async addToCartMenus(call: any, callback: any): Promise<void> {
         try {
+            // console.log('call requestr :', call.request);
+
             const data: AddToCartDTO = {
                 user_id: call.request.user_id,
                 item: {
@@ -19,8 +21,15 @@ export class CartController implements ICartController {
                     price: call.request.item.price,
                     name: call.request.item.name,
                     category: call.request.item.category,
+                    restaurantId: call.request.item.restaurantId,
                     restaurantName: call.request.item.restaurantName,
                     discount: call.request.item.discount,
+                    description: call.request.item.description,
+                    timing: call.request.item.timing,
+                    rating: call.request.item.rating,
+                    hasVariants: call.request.item.hasVariants,
+                    images: call.request.item.images,
+                    variants: call.request.item.variants || [],
                 },
             };
 
@@ -66,15 +75,30 @@ export class CartController implements ICartController {
 
     async removeCartItems(call: any, callback: any): Promise<void> {
         try {
-            console.log('call request :', call.request);
+            // console.log('call request :', call.request);
             const data: RemoveCartItemDTO = {
                 user_id: call.request.user_id,
                 menuId: call.request.menuId
             }
             const response = await this.cartService.removeCartItems(data)
-            callback(null,response)
+            callback(null, response)
         } catch (error) {
             console.log('Error in removeItems cart controller:', error);
+            callback({ error: (error as Error).message });
+        }
+    }
+
+    async deleteUserCart(call: any, callback: any): Promise<void> {
+        try {
+            console.log('call request :', call.request);
+            const data: DeleteUserCartDTO = {
+                user_id: call.request.user_id
+            };
+            const response = await this.cartService.deleteUserCart(data);
+            console.log('deleteUserCart response:', response);
+            callback(null, response);
+        } catch (error) {
+            console.log('Error in deleteUserCart cart controller:', error);
             callback({ error: (error as Error).message });
         }
     }

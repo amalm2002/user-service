@@ -4,8 +4,15 @@ export interface CartItemDTO {
     price: number;
     name: string;
     category: string;
+    restaurantId:string;
     restaurantName: string;
     discount?: number;
+    description: string; 
+    timing: string;
+    rating: number; 
+    hasVariants: boolean; 
+    images: string[]; 
+    variants: { name: string; price: number; quantity: number }[];
 }
 
 export interface AddToCartDTO {
@@ -27,4 +34,8 @@ export interface UpdateQuantityDTO {
 export interface RemoveCartItemDTO {
     user_id: string;
     menuId: string;
+}
+
+export interface DeleteUserCartDTO {
+    user_id: string;
 }

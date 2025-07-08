@@ -15,6 +15,9 @@ import { NodemailerService } from './services/implementations/nodemailer.service
 import { CartController } from './controllers/implementations/cart.controller';
 import CartService from './services/implementations/cart.service';
 import CartRepository from './repositories/implementations/cart.repository';
+import { WalletController } from './controllers/implementations/wallet.controller';
+import { WalletService } from './services/implementations/wallet.service';
+import { WalletRepository } from './repositories/implementations/wallet.repository';
 
 connectDB();
 
@@ -24,13 +27,16 @@ const bcryptService = new BcryptService();
 const generateOtpService = new GenerateOtpService();
 const nodemailerService = new NodemailerService();
 const cartRepo = new CartRepository()
+const walletRepo = new WalletRepository()
 const cartService = new CartService(cartRepo)
+const walletService = new WalletService(walletRepo)
 
 const registrationController = new RegistrationController(authService, userRepo, bcryptService);
 const loginController = new LoginController(userRepo, authService, bcryptService);
 const adminController = new AdminController(userRepo);
 const profileController = new ProfileController(userRepo);
 const cartController = new CartController(cartService,)
+const walletController = new WalletController(walletService)
 
 const packageDef = protoLoader.loadSync(path.resolve(__dirname, './proto/user.proto'), {
   keepCase: true,
@@ -68,7 +74,9 @@ server.addService(userProto.UserService.service, {
   AddToCart: cartController.addToCartMenus.bind(cartController),
   GetCartItems: cartController.getCartItems.bind(cartController),
   UpdateCartItemQuantity: cartController.updateCartItemQuantity.bind(cartController),
-  RemoveCartItem:cartController.removeCartItems.bind(cartController)
+  RemoveCartItem: cartController.removeCartItems.bind(cartController),
+  DeleteUserCart: cartController.deleteUserCart.bind(cartController),
+  UpdateWallet: walletController.updateWallet.bind(walletController)
 });
 
 const grpcServer = () => {

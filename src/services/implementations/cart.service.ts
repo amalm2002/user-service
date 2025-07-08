@@ -1,6 +1,6 @@
 import { ICartService } from '../interfaces/cart.service.interface';
 import { ICartRepository } from '../../repositories/interfaces/cart.repository.interface';
-import { AddToCartDTO, GetCartDTO, RemoveCartItemDTO, UpdateQuantityDTO } from '../../dto/cart/cart.dto';
+import { AddToCartDTO, DeleteUserCartDTO, GetCartDTO, RemoveCartItemDTO, UpdateQuantityDTO } from '../../dto/cart/cart.dto';
 import { Types } from 'mongoose';
 
 export default class CartService implements ICartService {
@@ -14,19 +14,35 @@ export default class CartService implements ICartService {
         try {
             const { user_id, item } = data;
 
+            // console.log('items :', item, '=================', data);
+
+
             if (!Types.ObjectId.isValid(user_id)) {
                 throw new Error('Invalid user ID');
             }
             if (!Types.ObjectId.isValid(item.menuId)) {
                 throw new Error('Invalid menu ID');
             }
+            if (!Types.ObjectId.isValid(item.restaurantId)) {
+                throw new Error('Invalid restaurant ID');
+            }
 
             const userId = new Types.ObjectId(user_id);
             const foodId = new Types.ObjectId(item.menuId);
+            const restaurantId = new Types.ObjectId(item.restaurantId);
 
             let cart = await this.cartRepository.findCartByUserId(user_id);
 
             if (cart) {
+
+                const existingRestaurantId = cart.items[0]?.restaurantId?.toString(); 
+                if (existingRestaurantId && existingRestaurantId !== item.restaurantId) {
+                    return {
+                        message: 'You can only add items from the same restaurant to the cart',
+                        success: false,
+                    };
+                }
+
                 const existingItemIndex = cart.items.findIndex(
                     (cartItem: any) => cartItem.menuId.toString() === item.menuId
                 );
@@ -44,7 +60,14 @@ export default class CartService implements ICartService {
                         name: item.name,
                         category: item.category,
                         discount: item.discount || 0,
-                        restaurantName: item.restaurantName
+                        restaurantName: item.restaurantName,
+                        restaurantId: restaurantId,
+                        description: item.description,
+                        timing: item.timing,
+                        rating: item.rating,
+                        hasVariants: item.hasVariants,
+                        images: item.images,
+                        variants: item.variants || [],
                     });
                 }
 
@@ -70,7 +93,14 @@ export default class CartService implements ICartService {
                             name: item.name,
                             category: item.category,
                             discount: item.discount || 0,
-                            restaurantName: item.restaurantName
+                            restaurantName: item.restaurantName,
+                            restaurantId: restaurantId,
+                            description: item.description,
+                            timing: item.timing,
+                            rating: item.rating,
+                            hasVariants: item.hasVariants,
+                            images: item.images,
+                            variants: item.variants || [],
                         },
                     ],
                     totalAmount: item.quantity * (item.price - (item.discount || 0)),
@@ -112,8 +142,15 @@ export default class CartService implements ICartService {
                     quantity: item.quantity,
                     price: item.price,
                     category: item.category,
+                    restaurantId: item.restaurantId,
                     restaurantName: item.restaurantName,
                     discount: item.discount || 0,
+                    description: item.description,
+                    timing: item.timing,
+                    rating: item.rating,
+                    hasVariants: item.hasVariants,
+                    images: item.images,
+                    variants: item.variants || [],
                 })),
                 totalAmount: cart.totalAmount,
             };
@@ -135,8 +172,15 @@ export default class CartService implements ICartService {
                     price: item.price,
                     name: item.name,
                     category: item.category,
+                    restaurantId: item.restaurantId,
                     restaurantName: item.restaurantName,
                     discount: item.discount,
+                    description: item.description,
+                    timing: item.timing,
+                    rating: item.rating,
+                    hasVariants: item.hasVariants,
+                    images: item.images,
+                    variants: item.variants || [],
                 })),
                 total_amount: updatedCart.totalAmount,
             };
@@ -152,35 +196,53 @@ export default class CartService implements ICartService {
         }
     }
 
-   async removeCartItems(data: RemoveCartItemDTO): Promise<any> {
-    try {
-        const updatedCart = await this.cartRepository.removeCartItemsById(data);
+    async removeCartItems(data: RemoveCartItemDTO): Promise<any> {
+        try {
+            const updatedCart = await this.cartRepository.removeCartItemsById(data);
 
-        const responseData = {
-            user_id: updatedCart.userId.toString(),
-            items: updatedCart.items.map((item: any) => ({
-                menuId: item.menuId.toString(),
-                quantity: item.quantity,
-                price: item.price,
-                name: item.name,
-                category: item.category,
-                restaurantName: item.restaurantName,
-                discount: item.discount,
-            })),
-            total_amount: updatedCart.totalAmount,
-           
-        };
+            const responseData = {
+                user_id: updatedCart.userId.toString(),
+                items: updatedCart.items.map((item: any) => ({
+                    menuId: item.menuId.toString(),
+                    quantity: item.quantity,
+                    price: item.price,
+                    name: item.name,
+                    category: item.category,
+                    restaurantId: item.restaurantId,
+                    restaurantName: item.restaurantName,
+                    discount: item.discount,
+                    description: item.description,
+                    timing: item.timing,
+                    rating: item.rating,
+                    hasVariants: item.hasVariants,
+                    images: item.images,
+                    variants: item.variants || [],
+                })),
+                total_amount: updatedCart.totalAmount,
 
-        return {
-            message: 'Item removed from cart successfully',
-            success: true,
-            cart: responseData,
-        };
-    } catch (error) {
-        console.log('Error in CartService.removeCartItems:', error);
-        throw error;
+            };
+
+            return {
+                message: 'Item removed from cart successfully',
+                success: true,
+                cart: responseData,
+            };
+        } catch (error) {
+            console.log('Error in CartService.removeCartItems:', error);
+            throw error;
+        }
     }
-}
 
+    async deleteUserCart(data: DeleteUserCartDTO): Promise<any> {
+        try {
+            console.log('service data :', data);
+            await this.cartRepository.deleteUserCartById(data);
+            return { success: true, message: 'Cart deleted successfully' };
+        } catch (error) {
+            console.log('error on cart service deleteUserCart side:', error);
+            throw error;
+        }
+
+    }
 
 }
