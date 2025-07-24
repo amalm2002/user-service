@@ -33,9 +33,7 @@ export class LoginController implements ILoginController {
       if (!isPasswordValid) {
         callback(null, { message: 'Invalid password' });
         return;
-      }
-      // console.log('user idddddd :',user._id.toString());
-      
+      }      
       const role = user.isAdmin ? 'Admin' : 'User';
       const token = await this.authService.createToken(user._id.toString(), '15m', role);
       const refreshToken = await this.authService.createToken(user._id.toString(), '7d', role);

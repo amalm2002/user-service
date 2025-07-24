@@ -1,6 +1,6 @@
 import { ICartService } from '../interfaces/cart.service.interface';
 import { ICartRepository } from '../../repositories/interfaces/cart.repository.interface';
-import { AddToCartDTO, DeleteUserCartDTO, GetCartDTO, RemoveCartItemDTO, UpdateQuantityDTO } from '../../dto/cart/cart.dto';
+import { AddToCartDTO, AddToCartresponseDTO, DeleteUserCartDTO, DeleteUserCartResponseDTO, GetCartDTO, GetCartResponseDTO, RemoveCartItemDTO, UpdateQuantityDTO, UpdateQuantityResponseDTO } from '../../dto/cart/cart.dto';
 import { Types } from 'mongoose';
 
 export default class CartService implements ICartService {
@@ -10,12 +10,9 @@ export default class CartService implements ICartService {
         this.cartRepository = cartRepository;
     }
 
-    async addToCartMenus(data: AddToCartDTO): Promise<any> {
+    async addToCartMenus(data: AddToCartDTO): Promise<AddToCartresponseDTO> {
         try {
             const { user_id, item } = data;
-
-            // console.log('items :', item, '=================', data);
-
 
             if (!Types.ObjectId.isValid(user_id)) {
                 throw new Error('Invalid user ID');
@@ -35,7 +32,7 @@ export default class CartService implements ICartService {
 
             if (cart) {
 
-                const existingRestaurantId = cart.items[0]?.restaurantId?.toString(); 
+                const existingRestaurantId = cart.items[0]?.restaurantId?.toString();
                 if (existingRestaurantId && existingRestaurantId !== item.restaurantId) {
                     return {
                         message: 'You can only add items from the same restaurant to the cart',
@@ -107,6 +104,8 @@ export default class CartService implements ICartService {
                 };
 
                 const createdCart = await this.cartRepository.createCart(newCart);
+                console.log('created cart :', createdCart);
+
                 return {
                     message: 'New cart created successfully',
                     cart: createdCart,
@@ -118,9 +117,8 @@ export default class CartService implements ICartService {
         }
     }
 
-    async getCartItems({ user_id }: GetCartDTO): Promise<any> {
+    async getCartItems({ user_id }: GetCartDTO): Promise<GetCartResponseDTO> {
         try {
-            // console.log('data is get :', user_id);
 
             if (!user_id || typeof user_id !== 'string') {
                 throw new Error(`Invalid user ID: ${user_id} (must be a string)`);
@@ -160,9 +158,8 @@ export default class CartService implements ICartService {
         }
     }
 
-    async updateCartItemQuantity(data: UpdateQuantityDTO): Promise<any> {
+    async updateCartItemQuantity(data: UpdateQuantityDTO): Promise<UpdateQuantityResponseDTO> {
         try {
-            // console.log('service side data for upQty :', data);
             const updatedCart = await this.cartRepository.updateCartItemQuantity(data);
             const responseData = {
                 user_id: updatedCart.userId.toString(),
@@ -196,7 +193,7 @@ export default class CartService implements ICartService {
         }
     }
 
-    async removeCartItems(data: RemoveCartItemDTO): Promise<any> {
+    async removeCartItems(data: RemoveCartItemDTO): Promise<UpdateQuantityResponseDTO> {
         try {
             const updatedCart = await this.cartRepository.removeCartItemsById(data);
 
@@ -221,7 +218,6 @@ export default class CartService implements ICartService {
                 total_amount: updatedCart.totalAmount,
 
             };
-
             return {
                 message: 'Item removed from cart successfully',
                 success: true,
@@ -233,9 +229,8 @@ export default class CartService implements ICartService {
         }
     }
 
-    async deleteUserCart(data: DeleteUserCartDTO): Promise<any> {
+    async deleteUserCart(data: DeleteUserCartDTO): Promise<DeleteUserCartResponseDTO> {
         try {
-            console.log('service data :', data);
             await this.cartRepository.deleteUserCartById(data);
             return { success: true, message: 'Cart deleted successfully' };
         } catch (error) {

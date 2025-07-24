@@ -1,0 +1,10 @@
+
+services:
+  user-service:
+    build: .
+    container_name: user-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env          
+      - .env.docker

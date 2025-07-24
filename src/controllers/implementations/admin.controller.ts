@@ -27,8 +27,6 @@ export class AdminController implements IAdminController {
     try {
       const { userId } = call.request as BlockUserDto;
       const response = await this.userRepository.findBlockUser(userId);
-      // console.log('user side response :', response);
-
       response.success === true
         ? callback(null, { success: true, message: "User blocked successfully", isActive: response.isActive, userId: response.userId })
         : callback(null, { success: false, message: "User unblocked successfully", isActive: response.isActive, userId: response.userId });
