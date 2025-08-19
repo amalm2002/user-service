@@ -4,11 +4,10 @@ import { AddToCartDTO, AddToCartresponseDTO, DeleteUserCartDTO, DeleteUserCartRe
 import { Types } from 'mongoose';
 
 export default class CartService implements ICartService {
-    private cartRepository: ICartRepository;
 
-    constructor(cartRepository: ICartRepository) {
-        this.cartRepository = cartRepository;
-    }
+    constructor(
+        private readonly _cartRepository: ICartRepository
+    ) { }
 
     async addToCartMenus(data: AddToCartDTO): Promise<AddToCartresponseDTO> {
         try {
@@ -28,7 +27,7 @@ export default class CartService implements ICartService {
             const foodId = new Types.ObjectId(item.menuId);
             const restaurantId = new Types.ObjectId(item.restaurantId);
 
-            let cart = await this.cartRepository.findCartByUserId(user_id);
+            let cart = await this._cartRepository.findCartByUserId(user_id);
 
             if (cart) {
 
@@ -74,7 +73,7 @@ export default class CartService implements ICartService {
                     0
                 );
 
-                const updatedCart = await this.cartRepository.updateCart(cart._id.toString(), cart);
+                const updatedCart = await this._cartRepository.updateCart(cart._id.toString(), cart);
                 return {
                     message: 'Item added to existing cart successfully',
                     cart: updatedCart,
@@ -103,7 +102,7 @@ export default class CartService implements ICartService {
                     totalAmount: item.quantity * (item.price - (item.discount || 0)),
                 };
 
-                const createdCart = await this.cartRepository.createCart(newCart);
+                const createdCart = await this._cartRepository.createCart(newCart);
                 console.log('created cart :', createdCart);
 
                 return {
@@ -127,7 +126,7 @@ export default class CartService implements ICartService {
                 throw new Error(`Invalid user ID format: ${user_id} (must be a valid ObjectId)`);
             }
 
-            const cart = await this.cartRepository.findCartByUserId(user_id);
+            const cart = await this._cartRepository.findCartByUserId(user_id);
 
             if (!cart) {
                 return { items: [] };
@@ -160,7 +159,7 @@ export default class CartService implements ICartService {
 
     async updateCartItemQuantity(data: UpdateQuantityDTO): Promise<UpdateQuantityResponseDTO> {
         try {
-            const updatedCart = await this.cartRepository.updateCartItemQuantity(data);
+            const updatedCart = await this._cartRepository.updateCartItemQuantity(data);
             const responseData = {
                 user_id: updatedCart.userId.toString(),
                 items: updatedCart.items.map((item: any) => ({
@@ -195,7 +194,7 @@ export default class CartService implements ICartService {
 
     async removeCartItems(data: RemoveCartItemDTO): Promise<UpdateQuantityResponseDTO> {
         try {
-            const updatedCart = await this.cartRepository.removeCartItemsById(data);
+            const updatedCart = await this._cartRepository.removeCartItemsById(data);
 
             const responseData = {
                 user_id: updatedCart.userId.toString(),
@@ -231,7 +230,7 @@ export default class CartService implements ICartService {
 
     async deleteUserCart(data: DeleteUserCartDTO): Promise<DeleteUserCartResponseDTO> {
         try {
-            await this.cartRepository.deleteUserCartById(data);
+            await this._cartRepository.deleteUserCartById(data);
             return { success: true, message: 'Cart deleted successfully' };
         } catch (error) {
             console.log('error on cart service deleteUserCart side:', error);

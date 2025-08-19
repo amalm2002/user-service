@@ -3,15 +3,13 @@ import { ICartService } from '../../services/interfaces/cart.service.interface';
 import { AddToCartDTO, DeleteUserCartDTO, GetCartDTO, RemoveCartItemDTO, UpdateQuantityDTO } from '../../dto/cart/cart.dto';
 
 export class CartController implements ICartController {
-    private cartService: ICartService;
 
-    constructor(cartService: ICartService) {
-        this.cartService = cartService;
-    }
+    constructor(
+        private readonly _cartService: ICartService
+    ) { }
 
     async addToCartMenus(call: any, callback: any): Promise<void> {
         try {
-            // console.log('call requestr :', call.request);
 
             const data: AddToCartDTO = {
                 user_id: call.request.user_id,
@@ -33,7 +31,7 @@ export class CartController implements ICartController {
                 },
             };
 
-            const response = await this.cartService.addToCartMenus(data);
+            const response = await this._cartService.addToCartMenus(data);
             callback(null, response);
         } catch (error) {
             console.log('Error in cart controller:', error);
@@ -43,12 +41,11 @@ export class CartController implements ICartController {
 
     async getCartItems(call: any, callback: any): Promise<void> {
         try {
-            // console.log('data is get :', call.request);
             if (!call.request.user_id) {
                 throw new Error('user_id is missing in the request');
             }
             const userId: GetCartDTO = { user_id: call.request.user_id };
-            const response = await this.cartService.getCartItems(userId);
+            const response = await this._cartService.getCartItems(userId);
             callback(null, response);
         } catch (error) {
             console.log('Error in get cart controller:', error);
@@ -58,13 +55,12 @@ export class CartController implements ICartController {
 
     async updateCartItemQuantity(call: any, callback: any): Promise<void> {
         try {
-            // console.log('call request :', call.request);
             const data: UpdateQuantityDTO = {
                 user_id: call.request.user_id,
                 menuId: call.request.menuId,
                 quantity: call.request.quantity
             }
-            const response = await this.cartService.updateCartItemQuantity(data)
+            const response = await this._cartService.updateCartItemQuantity(data)
             callback(null, response)
 
         } catch (error) {
@@ -75,12 +71,11 @@ export class CartController implements ICartController {
 
     async removeCartItems(call: any, callback: any): Promise<void> {
         try {
-            // console.log('call request :', call.request);
             const data: RemoveCartItemDTO = {
                 user_id: call.request.user_id,
                 menuId: call.request.menuId
             }
-            const response = await this.cartService.removeCartItems(data)
+            const response = await this._cartService.removeCartItems(data)
             callback(null, response)
         } catch (error) {
             console.log('Error in removeItems cart controller:', error);
@@ -90,11 +85,10 @@ export class CartController implements ICartController {
 
     async deleteUserCart(call: any, callback: any): Promise<void> {
         try {
-            console.log('call request :', call.request);
             const data: DeleteUserCartDTO = {
                 user_id: call.request.user_id
             };
-            const response = await this.cartService.deleteUserCart(data);
+            const response = await this._cartService.deleteUserCart(data);
             console.log('deleteUserCart response:', response);
             callback(null, response);
         } catch (error) {

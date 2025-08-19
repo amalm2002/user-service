@@ -3,7 +3,9 @@ import { UpdateWalletDTO, WalletResponseDTO } from "../../dto/wallet/update-wall
 import { IWalletController } from "../interfaces/wallet.controller.interface";
 
 export class WalletController implements IWalletController {
-    constructor(private service: IWalletService) { }
+    constructor(
+        private readonly _walletService: IWalletService
+    ) { }
 
     async updateWallet(call: any, callback: any): Promise<void> {
         const dto: UpdateWalletDTO = {
@@ -13,7 +15,7 @@ export class WalletController implements IWalletController {
             type: call.request.type,
         };
 
-        const result: WalletResponseDTO = await this.service.updateWallet(dto);
+        const result: WalletResponseDTO = await this._walletService.updateWallet(dto);
 
         callback(null, {
             success: result.success,

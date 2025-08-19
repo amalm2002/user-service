@@ -1,4 +1,3 @@
-
 import { IUserRepository } from '../../repositories/interfaces/user.repository.interface';
 import { IAuthService } from '../../services/interfaces/auth.service.interface';
 import { IBcryptService } from '../../services/interfaces/bcrypt.service.interface';
@@ -11,32 +10,29 @@ import { ResetPasswordDto } from '../../dto/login/reset-password.dto';
 import { sendOtp } from '../../utilities/otp-sending.util';
 
 export class LoginController implements ILoginController {
-  private userRepository: IUserRepository;
-  private authService: IAuthService;
-  private bcryptService: IBcryptService;
 
-  constructor(userRepository: IUserRepository, authService: IAuthService, bcryptService: IBcryptService) {
-    this.userRepository = userRepository;
-    this.authService = authService;
-    this.bcryptService = bcryptService;
-  }
+  constructor(
+    private readonly _userRepository: IUserRepository,
+    private readonly _authService: IAuthService,
+    private readonly _bcryptService: IBcryptService
+  ) { }
 
   async checkLoginUser(call: any, callback: any): Promise<void> {
     const { email, password } = call.request as CheckLoginDto;
     try {
-      const user = await this.userRepository.findUserByEmail(email);
+      const user = await this._userRepository.findUserByEmail(email);
       if (!user) {
         callback(null, { message: 'No user found' });
         return;
       }
-      const isPasswordValid = await this.bcryptService.matchPassword(password, user.password);
+      const isPasswordValid = await this._bcryptService.matchPassword(password, user.password);
       if (!isPasswordValid) {
         callback(null, { message: 'Invalid password' });
         return;
-      }      
+      }
       const role = user.isAdmin ? 'Admin' : 'User';
-      const token = await this.authService.createToken(user._id.toString(), '15m', role);
-      const refreshToken = await this.authService.createToken(user._id.toString(), '7d', role);
+      const token = await this._authService.createToken(user._id.toString(), '15m', role);
+      const refreshToken = await this._authService.createToken(user._id.toString(), '7d', role);
       callback(null, {
         message: 'Success',
         name: user.name,
@@ -56,14 +52,14 @@ export class LoginController implements ILoginController {
   async checkGoogleSignInUser(call: any, callback: any): Promise<void> {
     const { email } = call.request as GoogleSignInDto;
     try {
-      const user = await this.userRepository.findUserByEmail(email);
+      const user = await this._userRepository.findUserByEmail(email);
       if (!user) {
         callback(null, { message: 'No user found' });
         return;
       }
       const role = user.isAdmin ? 'Admin' : 'User';
-      const token = await this.authService.createToken(user._id.toString(), '15m', role);
-      const refreshToken = await this.authService.createToken(user._id.toString(), '7d', role);
+      const token = await this._authService.createToken(user._id.toString(), '15m', role);
+      const refreshToken = await this._authService.createToken(user._id.toString(), '7d', role);
       callback(null, {
         message: 'Success',
         name: user.name,
@@ -82,7 +78,7 @@ export class LoginController implements ILoginController {
   async forgotPasswordUser(call: any, callback: any): Promise<void> {
     const { email } = call.request as ForgotPasswordDto;
     try {
-      const user = await this.userRepository.findUserByEmail(email);
+      const user = await this._userRepository.findUserByEmail(email);
       if (!user) {
         callback(null, { message: 'No user found' });
         return;
@@ -102,9 +98,9 @@ export class LoginController implements ILoginController {
   async verifyOtp(call: any, callback: any): Promise<void> {
     const { email, otp, token } = call.request as VerifyOtpDto;
     try {
-      const jwtOtp: any = this.authService.verifyOption(token);
+      const jwtOtp: any = this._authService.verifyOption(token);
       if (otp === jwtOtp?.clientId) {
-        const user = await this.userRepository.findUserByEmail(email);
+        const user = await this._userRepository.findUserByEmail(email);
         if (!user) {
           callback(null, { message: 'No user found' });
           return;
@@ -125,11 +121,11 @@ export class LoginController implements ILoginController {
   async resetPassword(call: any, callback: any): Promise<void> {
     const { email, password, token } = call.request as ResetPasswordDto;
     try {
-      const user = await this.userRepository.findUserByEmail(email);
+      const user = await this._userRepository.findUserByEmail(email);
       if (!user) {
         throw new Error('User not found');
       }
-      await this.userRepository.updateUserPassword(email, password);
+      await this._userRepository.updateUserPassword(email, password);
       callback(null, { message: 'Password reset successfully' });
     } catch (error) {
       console.error('Error in resetPassword:', error);

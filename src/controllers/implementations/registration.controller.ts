@@ -9,24 +9,22 @@ import { ResendOtpDto } from '../../dto/registration/resend-otp.dto';
 import { sendOtp } from '../../utilities/otp-sending.util';
 
 export class RegistrationController implements IRegistrationController {
-  private authService: IAuthService;
-  private userRepository: IUserRepository;
-  private bcryptService: IBcryptService;
 
-  constructor(authService: IAuthService, userRepository: IUserRepository, bcryptService: IBcryptService) {
-    this.authService = authService;
-    this.userRepository = userRepository;
-    this.bcryptService = bcryptService;
-  }
+
+  constructor(
+    private readonly _authService: IAuthService,
+    private readonly _userRepository: IUserRepository,
+    private readonly _bcryptService: IBcryptService
+  ) { }
 
   async signup(call: any, callback: any): Promise<void> {
     const { name, email, password, otp, token, googleId } = call.request as CreateUserDto;
     try {
-      const jwtOtp: any = this.authService.verifyOption(token);
+      const jwtOtp: any = this._authService.verifyOption(token);
       if (otp === jwtOtp?.clientId) {
-        const hashedPassword = await this.bcryptService.securePassword(password);
+        const hashedPassword = await this._bcryptService.securePassword(password);
         const userData = { name, email, password: hashedPassword, googleId: googleId ?? null };
-        const response = await this.userRepository.saveUser(userData);
+        const response = await this._userRepository.saveUser(userData);
         callback(null, { message: 'Success', isAdmin: response.isAdmin, isActive: response.isActive });
       } else {
         callback(null, { message: 'invalid otp' });
@@ -40,7 +38,7 @@ export class RegistrationController implements IRegistrationController {
   async checkUser(call: any, callback: any): Promise<void> {
     const { email, name } = call.request as CheckUserDto;
     try {
-      const response = await this.userRepository.findUserByEmail(email);
+      const response = await this._userRepository.findUserByEmail(email);
       if (!response) {
         const token = await sendOtp(email, name);
         callback(null, { token, message: 'user not registered' });

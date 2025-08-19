@@ -4,15 +4,14 @@ import { IAdminController } from '../interfaces/admin.controller.interface';
 import { BlockUserDto } from '../../dto/admin/block-user.dto';
 
 export class AdminController implements IAdminController {
-  private userRepository: IUserRepository;
 
-  constructor(userRepository: IUserRepository) {
-    this.userRepository = userRepository;
-  }
+  constructor(
+    private readonly _userRepository: IUserRepository
+  ) { }
 
   async getAllUsers(call: any, callback: any): Promise<void> {
     try {
-      const response = await this.userRepository.findAllUsers(true);
+      const response = await this._userRepository.findAllUsers(true);
       const users = {
         users: response
       };
@@ -26,7 +25,7 @@ export class AdminController implements IAdminController {
   async blockUser(call: any, callback: any): Promise<void> {
     try {
       const { userId } = call.request as BlockUserDto;
-      const response = await this.userRepository.findBlockUser(userId);
+      const response = await this._userRepository.findBlockUser(userId);
       response.success === true
         ? callback(null, { success: true, message: "User blocked successfully", isActive: response.isActive, userId: response.userId })
         : callback(null, { success: false, message: "User unblocked successfully", isActive: response.isActive, userId: response.userId });

@@ -6,17 +6,17 @@ import { BcryptService } from '../../services/implementations/bcrypt.service';
 import { BaseRepository } from './base.repository';
 
 export class UserRepository extends BaseRepository<any> implements IUserRepository {
-  private bcryptService: IBcryptService;
+  private readonly _bcryptService: IBcryptService;
 
   constructor() {
     super(User);
-    this.bcryptService = new BcryptService();
+    this._bcryptService = new BcryptService();
   }
 
   async saveUser(userData: registration) {
     try {
       const userCount = await User.countDocuments();
-      const hashedPassword = await this.bcryptService.securePassword(userData.password);
+      const hashedPassword = await this._bcryptService.securePassword(userData.password);
       const newUser = new User({
         name: userData.name,
         email: userData.email,
@@ -85,7 +85,7 @@ export class UserRepository extends BaseRepository<any> implements IUserReposito
 
   async updateUserPassword(email: string, password: string) {
     try {
-      const hashedPassword = await this.bcryptService.securePassword(password);
+      const hashedPassword = await this._bcryptService.securePassword(password);
       const user = await User.findOneAndUpdate({ email }, { password: hashedPassword }, { new: true });
       return user;
     } catch (error) {
