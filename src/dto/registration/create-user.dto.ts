@@ -7,3 +7,9 @@ export interface CreateUserDto {
   token: string;
   googleId?: string;
 }
+
+export interface CreateUserResponseDTO {
+  message: string;
+  isAdmin?: boolean;
+  isActive?: boolean
+}

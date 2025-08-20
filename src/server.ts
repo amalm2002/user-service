@@ -17,7 +17,10 @@ import CartService from './services/implementations/cart.service';
 import CartRepository from './repositories/implementations/cart.repository';
 import { WalletController } from './controllers/implementations/wallet.controller';
 import { WalletService } from './services/implementations/wallet.service';
+import { ProfileService } from './services/implementations/profile.service';
 import { WalletRepository } from './repositories/implementations/wallet.repository';
+import { LoginService } from './services/implementations/login.service';
+import { RegistrationService } from './services/implementations/registration.service';
 
 connectDB();
 
@@ -30,11 +33,15 @@ const cartRepo = new CartRepository()
 const walletRepo = new WalletRepository()
 const cartService = new CartService(cartRepo)
 const walletService = new WalletService(walletRepo)
+const profileService = new ProfileService(userRepo)
+const loginService = new LoginService(userRepo, authService, bcryptService)
+const registrationService=new RegistrationService(authService, userRepo, bcryptService)
 
-const registrationController = new RegistrationController(authService, userRepo, bcryptService);
-const loginController = new LoginController(userRepo, authService, bcryptService);
+
+const registrationController = new RegistrationController(registrationService);
+const loginController = new LoginController(loginService);
 const adminController = new AdminController(userRepo);
-const profileController = new ProfileController(userRepo);
+const profileController = new ProfileController(profileService);
 const cartController = new CartController(cartService,)
 const walletController = new WalletController(walletService)
 

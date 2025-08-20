@@ -4,3 +4,7 @@ export interface ResetPasswordDto {
   password: string;
   token: string;
 }
+
+export interface ResetPasswordResponseDTO {
+  message: string;
+}

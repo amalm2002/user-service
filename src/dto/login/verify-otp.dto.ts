@@ -4,3 +4,7 @@ export interface VerifyOtpDto {
   otp: string;
   token: string;
 }
+
+export interface VerifyOtpResponseDTO {
+  message: string;
+}
