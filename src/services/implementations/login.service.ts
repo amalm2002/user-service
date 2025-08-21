@@ -16,8 +16,8 @@ export class LoginService implements ILoginService {
         private readonly _bcryptService: IBcryptService
     ) { }
 
-    async checkLoginUser(data: CheckLoginDto): Promise<CheckLoginResponseDTO> {
-        const { email, password } = data;
+    async checkLoginUser(loginUser: CheckLoginDto): Promise<CheckLoginResponseDTO> {
+        const { email, password } = loginUser;
         const user = await this._userRepository.findUserByEmail(email);
         if (!user) {
             return { message: 'No user found' };
@@ -43,8 +43,8 @@ export class LoginService implements ILoginService {
         };
     }
 
-    async checkGoogleSignInUser(data: GoogleSignInDto): Promise<CheckLoginResponseDTO> {
-        const { email } = data;
+    async checkGoogleSignInUser(googleSignIn: GoogleSignInDto): Promise<CheckLoginResponseDTO> {
+        const { email } = googleSignIn;
         const user = await this._userRepository.findUserByEmail(email);
         if (!user) {
             return { message: 'No user found' };
@@ -65,8 +65,8 @@ export class LoginService implements ILoginService {
         };
     }
 
-    async forgotPasswordUser(data: ForgotPasswordDto): Promise<ForgotPasswordResponseDTO> {
-        const { email } = data;
+    async forgotPasswordUser(userForgotPassword: ForgotPasswordDto): Promise<ForgotPasswordResponseDTO> {
+        const { email } = userForgotPassword;
         const user = await this._userRepository.findUserByEmail(email);
         if (!user) {
             return { message: 'No user found' };
@@ -78,8 +78,8 @@ export class LoginService implements ILoginService {
         return { message: 'user exist', token };
     }
 
-    async verifyOtp(data: VerifyOtpDto): Promise<VerifyOtpResponseDTO> {
-        const { email, otp, token } = data;
+    async verifyOtp(verify: VerifyOtpDto): Promise<VerifyOtpResponseDTO> {
+        const { email, otp, token } = verify;
         const jwtOtp: any = this._authService.verifyOption(token);
 
         if (otp === jwtOtp?.clientId) {
@@ -93,8 +93,8 @@ export class LoginService implements ILoginService {
         }
     }
 
-    async resetPassword(data: ResetPasswordDto): Promise<ResetPasswordResponseDTO> {
-        const { email, password } = data;
+    async resetPassword(resetPasswordRequest: ResetPasswordDto): Promise<ResetPasswordResponseDTO> {
+        const { email, password } = resetPasswordRequest;
         const user = await this._userRepository.findUserByEmail(email);
         if (!user) {
             throw new Error('User not found');

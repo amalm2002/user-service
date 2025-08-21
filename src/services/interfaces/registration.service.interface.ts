@@ -3,7 +3,7 @@ import { CheckUserDto, CheckUserResponseDTO } from '../../dto/registration/check
 import { ResendOtpDto, ResendOtpResponseDTO } from '../../dto/registration/resend-otp.dto';
 
 export interface IRegistrationService {
-  signup(data: CreateUserDto): Promise<CreateUserResponseDTO>;
-  checkUser(data: CheckUserDto): Promise<CheckUserResponseDTO>;
-  resendOtp(data: ResendOtpDto): Promise<ResendOtpResponseDTO>;
+  signup(userRegistrationRequest: CreateUserDto): Promise<CreateUserResponseDTO>;
+  checkUser(userCheckRequest: CheckUserDto): Promise<CheckUserResponseDTO>;
+  resendOtp(otpResendRequest: ResendOtpDto): Promise<ResendOtpResponseDTO>;
 }

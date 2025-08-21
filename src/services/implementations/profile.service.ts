@@ -11,8 +11,8 @@ export class ProfileService implements IProfileService {
         private readonly _userRepository: IUserRepository
     ) { }
 
-    async findUserByTheirId(data: FindUserDto): Promise<UpdateProfileResponseDTO> {
-        const response = await this._userRepository.findUserById(data.id);
+    async findUserByTheirId(findUserRequest: FindUserDto): Promise<UpdateProfileResponseDTO> {
+        const response = await this._userRepository.findUserById(findUserRequest.id);
         if (!response) {
             return { message: 'No User Found', isAdmin: false };
         }
@@ -38,8 +38,8 @@ export class ProfileService implements IProfileService {
         };
     }
 
-    async editProfile(data: UpdateProfileDto): Promise<UpdateProfileResponseDTO> {
-        const { id, name, phone } = data;
+    async editProfile(profileUpdateRequest: UpdateProfileDto): Promise<UpdateProfileResponseDTO> {
+        const { id, name, phone } = profileUpdateRequest;
 
         const nameRegex = /^[A-Za-z]{4,}$/;
         const phoneRegex = /^[1-9][0-9]{9}$/;
@@ -78,8 +78,8 @@ export class ProfileService implements IProfileService {
         };
     }
 
-    async addNewAddress(data: UpdateAddressDto): Promise<UpdateAddressResponseDTO> {
-        const { userId, address, index } = data;
+    async addNewAddress(addressAddRequest: UpdateAddressDto): Promise<UpdateAddressResponseDTO> {
+        const { userId, address, index } = addressAddRequest;
         let updatedAddress;
         if (index === -1) {
             updatedAddress = await this._userRepository.addAddress(userId, address);
@@ -97,8 +97,8 @@ export class ProfileService implements IProfileService {
         };
     }
 
-    async deleteUserAddress(data: DeleteAddressDto): Promise<DeleteAddressResponseDTO> {
-        await this._userRepository.deleteAddressByIndex(data.id, data.index);
+    async deleteUserAddress(addressDeleteRequest: DeleteAddressDto): Promise<DeleteAddressResponseDTO> {
+        await this._userRepository.deleteAddressByIndex(addressDeleteRequest.id, addressDeleteRequest.index);
         return { success: true, message: 'Address deleted successfully' };
     }
 }

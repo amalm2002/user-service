@@ -7,21 +7,21 @@ export class WalletService implements IWalletService {
         private readonly _walletRepository: IWalletRepository
     ) { }
 
-    async updateWallet(dto: UpdateWalletDTO): Promise<WalletResponseDTO> {
-        let wallet = await this._walletRepository.findWalletByUserId(dto.userId);
+    async updateWallet(walletUpdateRequest: UpdateWalletDTO): Promise<WalletResponseDTO> {
+        let wallet = await this._walletRepository.findWalletByUserId(walletUpdateRequest.userId);
 
         if (!wallet) {
-            wallet = await this._walletRepository.createWallet(dto.userId);
+            wallet = await this._walletRepository.createWallet(walletUpdateRequest.userId);
             if (!wallet) {
                 return { success: false, message: 'Failed to create wallet' };
             }
         }
 
         const updatedWallet = await this._walletRepository.updateWallet(
-            dto.userId,
-            dto.amount,
-            dto.type,
-            dto.description
+            walletUpdateRequest.userId,
+            walletUpdateRequest.amount,
+            walletUpdateRequest.type,
+            walletUpdateRequest.description
         );
 
         if (!updatedWallet) {

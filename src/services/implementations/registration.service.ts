@@ -14,8 +14,8 @@ export class RegistrationService implements IRegistrationService {
     private readonly _bcryptService: IBcryptService
   ) { }
 
-  async signup(data: CreateUserDto): Promise<CreateUserResponseDTO> {
-    const { name, email, password, otp, token, googleId } = data;
+  async signup(userRegistrationRequest: CreateUserDto): Promise<CreateUserResponseDTO> {
+    const { name, email, password, otp, token, googleId } = userRegistrationRequest;
 
     const jwtOtp: any = this._authService.verifyOption(token);
     if (otp === jwtOtp?.clientId) {
@@ -28,8 +28,8 @@ export class RegistrationService implements IRegistrationService {
     }
   }
 
-  async checkUser(data: CheckUserDto): Promise<CheckUserResponseDTO> {
-    const { email, name } = data;
+  async checkUser(userCheckRequest: CheckUserDto): Promise<CheckUserResponseDTO> {
+    const { email, name } = userCheckRequest;
     const response = await this._userRepository.findUserByEmail(email);
     if (!response) {
       const token = await sendOtp(email, name);
@@ -39,8 +39,8 @@ export class RegistrationService implements IRegistrationService {
     }
   }
 
-  async resendOtp(data: ResendOtpDto): Promise<ResendOtpResponseDTO> {
-    const { email, name } = data;
+  async resendOtp(otpResendRequest: ResendOtpDto): Promise<ResendOtpResponseDTO> {
+    const { email, name } = otpResendRequest;
     const token = await sendOtp(email, name);
     return { token, message: 'Resend OTP sent to your mail' };
   }

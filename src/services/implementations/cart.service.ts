@@ -9,9 +9,9 @@ export default class CartService implements ICartService {
         private readonly _cartRepository: ICartRepository
     ) { }
 
-    async addToCartMenus(data: AddToCartDTO): Promise<AddToCartresponseDTO> {
+    async addToCartMenus(cartData: AddToCartDTO): Promise<AddToCartresponseDTO> {
         try {
-            const { user_id, item } = data;
+            const { user_id, item } = cartData;
 
             if (!Types.ObjectId.isValid(user_id)) {
                 throw new Error('Invalid user ID');
@@ -103,8 +103,6 @@ export default class CartService implements ICartService {
                 };
 
                 const createdCart = await this._cartRepository.createCart(newCart);
-                console.log('created cart :', createdCart);
-
                 return {
                     message: 'New cart created successfully',
                     cart: createdCart,
@@ -157,9 +155,9 @@ export default class CartService implements ICartService {
         }
     }
 
-    async updateCartItemQuantity(data: UpdateQuantityDTO): Promise<UpdateQuantityResponseDTO> {
+    async updateCartItemQuantity(quantityUpdate: UpdateQuantityDTO): Promise<UpdateQuantityResponseDTO> {
         try {
-            const updatedCart = await this._cartRepository.updateCartItemQuantity(data);
+            const updatedCart = await this._cartRepository.updateCartItemQuantity(quantityUpdate);
             const responseData = {
                 user_id: updatedCart.userId.toString(),
                 items: updatedCart.items.map((item: any) => ({
@@ -192,9 +190,9 @@ export default class CartService implements ICartService {
         }
     }
 
-    async removeCartItems(data: RemoveCartItemDTO): Promise<UpdateQuantityResponseDTO> {
+    async removeCartItems(removeRequest: RemoveCartItemDTO): Promise<UpdateQuantityResponseDTO> {
         try {
-            const updatedCart = await this._cartRepository.removeCartItemsById(data);
+            const updatedCart = await this._cartRepository.removeCartItemsById(removeRequest);
 
             const responseData = {
                 user_id: updatedCart.userId.toString(),
@@ -228,9 +226,9 @@ export default class CartService implements ICartService {
         }
     }
 
-    async deleteUserCart(data: DeleteUserCartDTO): Promise<DeleteUserCartResponseDTO> {
+    async deleteUserCart(deleteRequest: DeleteUserCartDTO): Promise<DeleteUserCartResponseDTO> {
         try {
-            await this._cartRepository.deleteUserCartById(data);
+            await this._cartRepository.deleteUserCartById(deleteRequest);
             return { success: true, message: 'Cart deleted successfully' };
         } catch (error) {
             console.log('error on cart service deleteUserCart side:', error);

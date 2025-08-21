@@ -5,9 +5,9 @@ import { VerifyOtpDto, VerifyOtpResponseDTO } from '../../dto/login/verify-otp.d
 import { ResetPasswordDto, ResetPasswordResponseDTO } from '../../dto/login/reset-password.dto';
 
 export interface ILoginService {
-  checkLoginUser(data: CheckLoginDto): Promise<CheckLoginResponseDTO>;
-  checkGoogleSignInUser(data: GoogleSignInDto): Promise<CheckLoginResponseDTO>;
-  forgotPasswordUser(data: ForgotPasswordDto): Promise<ForgotPasswordResponseDTO>;
-  verifyOtp(data: VerifyOtpDto): Promise<VerifyOtpResponseDTO>;
-  resetPassword(data: ResetPasswordDto): Promise<ResetPasswordResponseDTO>;
+  checkLoginUser(loginUser: CheckLoginDto): Promise<CheckLoginResponseDTO>;
+  checkGoogleSignInUser(googleSignIn: GoogleSignInDto): Promise<CheckLoginResponseDTO>;
+  forgotPasswordUser(userForgotPassword: ForgotPasswordDto): Promise<ForgotPasswordResponseDTO>;
+  verifyOtp(verify: VerifyOtpDto): Promise<VerifyOtpResponseDTO>;
+  resetPassword(resetPasswordRequest: ResetPasswordDto): Promise<ResetPasswordResponseDTO>;
 }

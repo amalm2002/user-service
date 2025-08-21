@@ -89,7 +89,6 @@ export class CartController implements ICartController {
                 user_id: call.request.user_id
             };
             const response = await this._cartService.deleteUserCart(data);
-            console.log('deleteUserCart response:', response);
             callback(null, response);
         } catch (error) {
             console.log('Error in deleteUserCart cart controller:', error);

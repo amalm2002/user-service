@@ -1,9 +1,19 @@
-import { AddToCartDTO, AddToCartresponseDTO, DeleteUserCartDTO, DeleteUserCartResponseDTO, GetCartDTO, GetCartResponseDTO, RemoveCartItemDTO, UpdateQuantityDTO, UpdateQuantityResponseDTO } from "../../dto/cart/cart.dto";
+import {
+    AddToCartDTO,
+    AddToCartresponseDTO,
+    DeleteUserCartDTO,
+    DeleteUserCartResponseDTO,
+    GetCartDTO,
+    GetCartResponseDTO,
+    RemoveCartItemDTO,
+    UpdateQuantityDTO,
+    UpdateQuantityResponseDTO
+} from "../../dto/cart/cart.dto";
 
 export interface ICartService {
-    addToCartMenus(data: AddToCartDTO): Promise<AddToCartresponseDTO>;
-    getCartItems(userId: GetCartDTO): Promise<GetCartResponseDTO>;
-    updateCartItemQuantity(data: UpdateQuantityDTO): Promise<UpdateQuantityResponseDTO>
-    removeCartItems(data: RemoveCartItemDTO): Promise<UpdateQuantityResponseDTO>
-    deleteUserCart(data: DeleteUserCartDTO): Promise<DeleteUserCartResponseDTO>
+    addToCartMenus(cartData: AddToCartDTO): Promise<AddToCartresponseDTO>;
+    getCartItems(cartRequest: GetCartDTO): Promise<GetCartResponseDTO>;
+    updateCartItemQuantity(quantityUpdate: UpdateQuantityDTO): Promise<UpdateQuantityResponseDTO>
+    removeCartItems(removeRequest: RemoveCartItemDTO): Promise<UpdateQuantityResponseDTO>
+    deleteUserCart(dadeleteRequestta: DeleteUserCartDTO): Promise<DeleteUserCartResponseDTO>
 }
