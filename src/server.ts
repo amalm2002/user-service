@@ -35,7 +35,7 @@ const cartService = new CartService(cartRepo)
 const walletService = new WalletService(walletRepo)
 const profileService = new ProfileService(userRepo)
 const loginService = new LoginService(userRepo, authService, bcryptService)
-const registrationService=new RegistrationService(authService, userRepo, bcryptService)
+const registrationService = new RegistrationService(authService, userRepo, bcryptService)
 
 
 const registrationController = new RegistrationController(registrationService);
@@ -89,7 +89,6 @@ server.addService(userProto.UserService.service, {
 const grpcServer = () => {
   const port = process.env.PORT || '3003';
   const Domain = process.env.NODE_ENV === 'dev' ? process.env.DEV_DOMAIN : process.env.PRO_DOMAIN_USER;
-
   server.bindAsync(`${Domain}:${port}`, grpc.ServerCredentials.createInsecure(), (err, bindPort) => {
     if (err) {
       console.error("Error starting gRPC server:", err);
