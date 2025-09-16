@@ -21,7 +21,6 @@ import { ProfileService } from './services/implementations/profile.service';
 import { WalletRepository } from './repositories/implementations/wallet.repository';
 import { LoginService } from './services/implementations/login.service';
 import { RegistrationService } from './services/implementations/registration.service';
-import express from 'express';
 
 connectDB();
 
@@ -45,10 +44,6 @@ const adminController = new AdminController(userRepo);
 const profileController = new ProfileController(profileService);
 const cartController = new CartController(cartService,)
 const walletController = new WalletController(walletService)
-
-const app = express();
-const router = express.Router()
-
 
 const packageDef = protoLoader.loadSync(path.resolve(__dirname, './proto/user.proto'), {
   keepCase: true,
@@ -90,13 +85,12 @@ server.addService(userProto.UserService.service, {
   DeleteUserCart: cartController.deleteUserCart.bind(cartController),
   UpdateWallet: walletController.updateWallet.bind(walletController)
 });
-const port = process.env.PORT || '3003';
-const port2 = '3003';
+
 const grpcServer = () => {
-  
+  const port = process.env.PORT || '3003';
   const Domain = process.env.NODE_ENV === 'dev' ? process.env.DEV_DOMAIN : process.env.PRO_DOMAIN_USER;
   console.log('domain :',Domain)
-  server.bindAsync(`${Domain}:${port2}`, grpc.ServerCredentials.createInsecure(), (err, bindPort) => {
+  server.bindAsync(`${Domain}:${port}`, grpc.ServerCredentials.createInsecure(), (err, bindPort) => {
     if (err) {
       console.error("Error starting gRPC server:", err);
       return;
@@ -105,14 +99,4 @@ const grpcServer = () => {
   });
 };
 
-app.use((req,res,next)=>{
-  console.log(req.method , 'method' , req.url , "url")
-  next();
-})
-
-
-app.listen(port,()=>{
-  console.log("trying to rurn")
 grpcServer();
-})
-
