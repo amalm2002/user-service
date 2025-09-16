@@ -87,29 +87,17 @@ server.addService(userProto.UserService.service, {
 });
 
 const grpcServer = () => {
+  console.log("PORT from Railway:", process.env.PORT);
   const port = process.env.PORT || '3003';
   const Domain = process.env.NODE_ENV === 'dev' ? process.env.DEV_DOMAIN : process.env.PRO_DOMAIN_USER;
-  console.log('domain :', Domain)
-  // server.bindAsync(`${Domain}:${port}`, grpc.ServerCredentials.createInsecure(), (err, bindPort) => {
-  //   if (err) {
-  //     console.error("Error starting gRPC server:", err);
-  //     return;
-  //   }
-  //   console.log(`gRPC user server started on port:${bindPort}`);
-  // });
-  server.bindAsync(
-    `0.0.0.0:${port}`, // Must bind to 0.0.0.0, not localhost
-    grpc.ServerCredentials.createInsecure(),
-    (err, boundPort) => {
-      if (err) {
-        console.error('❌ Failed to bind gRPC server:', err);
-        process.exit(1);
-      }
-      console.log(`✅ gRPC server successfully bound to 0.0.0.0:${boundPort}`);
-      server.start();
-      console.log(`✅ gRPC server started and ready to accept connections`);
+  console.log('domain :',Domain)
+  server.bindAsync(`${Domain}:${port}`, grpc.ServerCredentials.createInsecure(), (err, bindPort) => {
+    if (err) {
+      console.error("Error starting gRPC server:", err);
+      return;
     }
-  );
+    console.log(`gRPC user server started on port:${bindPort}`);
+  });
 };
 
 grpcServer();
