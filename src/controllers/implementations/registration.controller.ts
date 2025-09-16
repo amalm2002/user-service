@@ -7,15 +7,29 @@ import { ResendOtpDto } from '../../dto/registration/resend-otp.dto';
 export class RegistrationController implements IRegistrationController {
   constructor(private readonly _registrationService: IRegistrationService) {}
 
+  // async signup(call: any, callback: any): Promise<void> {
+  //   try {     
+  //     const response = await this._registrationService.signup(call.request as CreateUserDto);
+  //     callback(null, response);
+  //   } catch (error) {
+  //     console.error('Signup error:', error);
+  //     callback(500, { error: (error as Error).message });
+  //   }
+  // }
+
   async signup(call: any, callback: any): Promise<void> {
-    try {     
-      const response = await this._registrationService.signup(call.request as CreateUserDto);
-      callback(null, response);
-    } catch (error) {
-      console.error('Signup error:', error);
-      callback(500, { error: (error as Error).message });
-    }
+  try {
+    console.log("📥 [UserService] Signup request:", call.request);
+    const response = await this._registrationService.signup(call.request);
+    console.log("📤 [UserService] Signup response:", response);
+
+    callback(null, response);
+  } catch (error) {
+    console.error("❌ [UserService] Signup error:", error);
+    callback(500, { error: (error as Error).message });
   }
+}
+
 
   async checkUser(call: any, callback: any): Promise<void> {
     try {
