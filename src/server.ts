@@ -87,7 +87,7 @@ server.addService(userProto.UserService.service, {
 });
 
 const grpcServer = () => {
-  const port = process.env.PORT || '8080';
+  const port = process.env.PORT || '3003';
   const Domain = process.env.NODE_ENV === 'dev' ? process.env.DEV_DOMAIN : process.env.PRO_DOMAIN_USER;
   console.log('domain :',Domain)
   server.bindAsync(`${Domain}:${port}`, grpc.ServerCredentials.createInsecure(), (err, bindPort) => {
